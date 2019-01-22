@@ -21,17 +21,31 @@ object FareGenerator {
   }
 
   /**
-    * Converts csv to parquet.
+    * Converts csv to avro.
     *
     * @param df
     * @param path
     */
   def save(df: DataFrame, path: String) = {
-    df.write.format("parquet").save(path)
+    df.write.format("avro").save(path)
+  }
+
+
+  /**
+    * Replicates same flight information (to/from/when)
+    * @param df
+    * @param n
+    * @return
+    */
+  def replicate(df: DataFrame, n: Int) = {
+    df.withColumn("dummy", explode(array((1 until n).map(lit): _*)))
+      .drop("dummy")
   }
 
   /**
-    * For every flight, assign a value based on a right skewed distribution
+    * Appends different fare for each flight.
+    *
+    * Fare based on a right skewed distribution
     * Right Skew and number range is guaranteed by this idea:
     *   Math.max(min_fare, Math.min(max_fare, (int) mean + Random.nextGaussian() * stddev)))
     *
@@ -49,17 +63,31 @@ object FareGenerator {
     val MEAN=253
     val STDDEV=60
 
-    val withFare = df.withColumn("RIGHTSKEWDISTR", randn(seed=10)*STDDEV+MEAN)
+    val withFare = df.withColumn("RIGHTSKEWDISTR", round(randn(seed=10)*STDDEV+MEAN,2))
     withFare.withColumn("FARE",
       when(col("RIGHTSKEWDISTR") < MIN_FARE, scala.util.Random.nextInt((75 - 35) + 1) + 35)
         .when(col("RIGHTSKEWDISTR") > MAX_FARE, MAX_FARE)
         .otherwise(col("RIGHTSKEWDISTR")))
   }
 
+  /**
+    * Creates normalized time columns - timestamp, epoch time
+    * @param df
+    * @return
+    */
+  def getEpoch(df: DataFrame): DataFrame = {
+    val withTime = df.withColumn("TIME", concat(col("FL_DATE"),lit(" "),col("CRS_DEP_TIME")))
+    val withEpoch = withTime.withColumn("EPOCH",unix_timestamp(col("time"),"yyyy-MM-dd HHmm"))
+    withEpoch.withColumn("TIMESTAMP",to_timestamp(col("EPOCH")))
+  }
+
   def main(args: Array[String]): Unit = {
-    val df = sqlContext.read.option("header", "true").csv("src/main/resources/input")
-    println(generateFare(df).count)
-    save(generateFare(df), "src/main/resources/output/")
+    val df = sqlContext.read.option("header", "true").csv("src/main/resources/in")
+    val withEpoch = getEpoch(df).filter("EPOCH is not null").select("EPOCH","TIMESTAMP","ORIGIN","DEST")
+    val withReplication = replicate(withEpoch,100)
+    val withFare = generateFare(withReplication)
+//    println(withFare.count)
+    save(withFare, "src/main/resources/out/")
   }
 
 }
