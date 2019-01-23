@@ -3,4 +3,5 @@ resources/
 out/
 target/
 .idea
-project/
+project/target/
+project/project/
