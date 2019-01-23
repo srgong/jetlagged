@@ -21,13 +21,14 @@ object FareGenerator {
   }
 
   /**
-    * Converts csv to avro.
-    *
+    * Converts csv to json.
+    * Avro Requires Spark 2.4.0
     * @param df
     * @param path
     */
   def save(df: DataFrame, path: String) = {
-    df.write.format("avro").save(path)
+    df.write.format("json").save(path)
+//    df.write.format("avro").save(path)
   }
 
 
@@ -84,10 +85,11 @@ object FareGenerator {
   def main(args: Array[String]): Unit = {
     val df = sqlContext.read.option("header", "true").csv("src/main/resources/in")
     val withEpoch = getEpoch(df).filter("EPOCH is not null").select("EPOCH","TIMESTAMP","ORIGIN","DEST")
+//    println(withEpoch.count) 464,205
     val withReplication = replicate(withEpoch,100)
     val withFare = generateFare(withReplication)
-//    println(withFare.count)
-    save(withFare, "src/main/resources/out/")
+    //println(withFare.count) 45,956,295
+    save(withFare, "src/main/resources/json/")
   }
 
 }

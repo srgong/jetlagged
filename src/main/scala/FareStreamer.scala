@@ -13,7 +13,6 @@ object FareStreamer {
 
   def main(args: Array[String]): Unit = {
     val broker = args(0) //"127.0.0.1:9092"
-    val partition = args(1)
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
       val properties = new Properties()
@@ -26,16 +25,18 @@ object FareStreamer {
       //    properties.put("buffer.memory", 33554432)
     }
 
-    val df = sqlContext.read.format("avro").load("src/main/resources/out").rdd
-    val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
+//    val df = sqlContext.read.format("avro").load("src/main/resources/out").rdd
+    val df = sqlContext.read.json("src/main/resources/json").rdd
 
     df.foreachPartition { eachPartition => {
+      val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
       eachPartition.toList.foreach { eachElement => {
-        println(eachElement.toString())
-        val kMessage = new ProducerRecord[String, String]("flights", partition, eachElement.toString())
+        val kMessage = new ProducerRecord[String, String]("flights", null, eachElement.toString())
         kProducer.send(kMessage)
       }}}
     }
+
+
   }
 
 }
