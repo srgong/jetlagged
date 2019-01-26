@@ -16,17 +16,21 @@ libraryDependencies ++= Seq(
 //  "org.apache.kafka" % "kafka-clients" % "1.0.0",
   "org.apache.spark" % "spark-streaming_2.11" % "2.3.1",
 "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1",
+//  "redis.clients" % "jedis" % "3.0.0",
   "com.redislabs" % "spark-redis" % "2.3.1-M2"
+//  "com.redislabs" % "spark-redis" % "2.3.0"
 )
 
+resolvers += "rediscala" at "https://raw.github.com/etaty/rediscala-mvn/master/releases/"
+//
 assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+//  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
-  case "META-INF/services/org.apache.spark.sql.redis.DataSourceRegister" => MergeStrategy.concat
-//  case PathList("javax", "servlet", xs @ _*)         => MergeStrategy.first
-//  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
-//  case "application.conf"                            => MergeStrategy.concat
-//  case "unwanted.txt"                                => MergeStrategy.discard
+  case "org.apache.spark.sql.redis.DefaultSource" => MergeStrategy.concat
+////  case PathList("javax", "servlet", xs @ _*)         => MergeStrategy.first
+////  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
+  case "application.conf"                            => MergeStrategy.concat
+////  case "unwanted.txt"                                => MergeStrategy.discard
   case x => MergeStrategy.first
 }
 
