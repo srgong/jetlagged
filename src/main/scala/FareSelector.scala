@@ -1,15 +1,7 @@
-import org.apache.kafka.common.serialization.StringDeserializer
-import org.apache.spark.sql.streaming.{ProcessingTime, Trigger}
 import org.apache.spark.{SparkConf, SparkContext, streaming}
 import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-//import redis.RedisClient
-//import org.apache.kafka.clients.consumer.ConsumerRecord
-//import org.apache.kafka.common.serialization.StringDeserializer
-//import org.apache.spark.streaming.kafka010._
-//import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
-//import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
-//import org.apache.spark.sql.streaming.DataStreamReader
+
 
 /**
   * Created by Sharon on 1/20/19.
@@ -22,7 +14,7 @@ object FareSelector {
     .set("spark.kafka.brokers","ec2-34-234-235-148.compute-1.amazonaws.com:9092")
     .set("spark.redis.host", "ec2-54-227-20-247.compute-1.amazonaws.com")
     .set("spark.redis.port", "6379")
-    .set("spark.deploy.mode", "cluster")
+    .set("spark.deploy.mode", "client")
     .set("spark.driver.cores", "1")
     .set("spark.executor.memory", "4g")
     .set("spark.driver.memory", "1g")
