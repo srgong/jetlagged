@@ -16,16 +16,16 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   */
 object FareSelector {
   val sparkConf = new SparkConf()
-    .setMaster("local[2]")
-//    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
+//    .setMaster("local[2]")
+    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
     .setAppName("Flight to DB")
     .set("spark.kafka.brokers","ec2-34-234-235-148.compute-1.amazonaws.com:9092")
     .set("spark.redis.host", "ec2-54-227-20-247.compute-1.amazonaws.com")
     .set("spark.redis.port", "6379")
-//    .set("spark.deploy.mode", "cluster")
-//    .set("spark.driver.cores", "1")
-//    .set("spark.executor.memory", "4g")
-//    .set("spark.driver.memory", "1g")
+    .set("spark.deploy.mode", "cluster")
+    .set("spark.driver.cores", "1")
+    .set("spark.executor.memory", "4g")
+    .set("spark.driver.memory", "1g")
 
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
