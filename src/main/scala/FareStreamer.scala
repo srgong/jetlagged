@@ -9,9 +9,7 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
   */
 object FareStreamer {
   val sparkConf = new SparkConf()
-    .setMaster("local[2]")
     .setAppName("Fare Streamer")
-    .set("spark.kafka.producer","ec2-18-211-107-25.compute-1.amazonaws.com:9092")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
     val sqlContext: SQLContext = spark.sqlContext
@@ -20,7 +18,7 @@ object FareStreamer {
   import org.apache.kafka.clients.producer.ProducerRecord
 
   def main(args: Array[String]): Unit = {
-    val broker = sparkConf.get("spark.kafka.consumer") //"127.0.0.1:9092"
+    val broker = sparkConf.get("spark.kafka.broker") //"127.0.0.1:9092"
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
       val properties = new Properties()
