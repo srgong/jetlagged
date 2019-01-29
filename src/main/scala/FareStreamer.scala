@@ -9,12 +9,17 @@ import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
 /**
   * Created by Sharon on 1/22/19.
   */
-object FareStreamer {
+object FareStreamer  {
+//    val spark = buildSparkSession
+//    {
   val sparkConf = new SparkConf()
     .setAppName("Fare Streamer")
+      .setMaster("local[2]")
 //    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
+//      .set("spark.driver.memory","1g")
+//      .set("spark.executor.memory","4g")
 //    .set("deploy-mode", "cluster")
-//    .set("spark.kafka.broker","spark://ec2-18-211-110-36.compute-1.amazonaws.com:9092")
+    .set("spark.kafka.broker","ec2-18-211-110-36.compute-1.amazonaws.com:9092")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
     val sqlContext: SQLContext = spark.sqlContext
@@ -58,7 +63,8 @@ object FareStreamer {
   }
 
   def main(args: Array[String]): Unit = {
-    val broker = sparkConf.get("spark.kafka.broker") //"127.0.0.1:9092"
+//    val broker = sparkConf.get("spark.kafka.broker") //"127.0.0.1:9092"
+    val broker = "ec2-18-211-110-36.compute-1.amazonaws.com:9092" //"127.0.0.1:9092"
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
       val properties = new Properties()
@@ -96,17 +102,22 @@ object FareStreamer {
 //    val df = sqlContext.read.option("header", "true").csv("src/main/resources/csv")
     val df = sqlContext.read
       .option("header", "true")
-      .option("inferSchema", "true")
-    .schema(customSchema)
-  .csv("hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/user/ubuntu/201712.csv")
-    val withEpoch = getEpoch(df).filter("epoch is not null").select("epoch","timestamp","origin","dest")
-    val withReplication = replicate(withEpoch,100)
-    val withFare = generateFare(withReplication).rdd
+//    .schema(customSchema)
+//  .csv("src/main/resources/csv/201712.csv")
+//  .csv("hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/user/ubuntu/201712.csv")
+//  .json("hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/user/ubuntu/part-00000-074c9c13-836b-422a-b87c-c3bdc67817c1-c000.json")
+  .json("src/main/resources/json").rdd
+//    val withEpoch = getEpoch(df).filter("epoch is not null").select("epoch","timestamp","origin","dest")
+//    val withReplication = replicate(withEpoch,10)
+//    val withFare = generateFare(withReplication).rdd
 
-    withFare.foreachPartition { eachPartition => {
+    println(df.count)
+
+    df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
       eachPartition.toList.foreach { eachElement => {
-        val kMessage = new ProducerRecord[String, String]("flights", null, eachElement.toString())
+//        println(eachElement.toString())
+        val kMessage = new ProducerRecord[String, String]("april", null, eachElement.toString())
         kProducer.send(kMessage)
       }}}
     }

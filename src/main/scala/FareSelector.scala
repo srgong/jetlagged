@@ -1,6 +1,6 @@
 
 import org.apache.spark.{SparkConf, SparkContext, streaming}
-import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
+import org.apache.spark.sql.{DataFrame, ForeachWriter, SQLContext, SparkSession}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 
@@ -10,12 +10,13 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
 object FareSelector {
   val sparkConf = new SparkConf()
 //    .setMaster("local[2]")
+//    .setMaster("spark://ec2-3-91-113-70.compute-1.amazonaws.com:7077")
     .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
     .setAppName("Flight to DB")
-    .set("spark.kafka.brokers","ec2-34-234-235-148.compute-1.amazonaws.com:9092")
+    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092,ec2-18-211-107-25.compute-1.amazonaws.com:9092,ec2-34-234-235-148.compute-1.amazonaws.com:9092")
     .set("spark.redis.host", "ec2-54-227-20-247.compute-1.amazonaws.com")
     .set("spark.redis.port", "6379")
-    .set("spark.deploy.mode", "client")
+//    .set("spark.deploy.mode", "cluster")
     .set("spark.driver.cores", "1")
     .set("spark.executor.memory", "4g")
     .set("spark.driver.memory", "1g")
@@ -37,6 +38,8 @@ object FareSelector {
     import org.apache.spark.sql.types._
     import org.apache.spark.sql.functions._
     import org.apache.spark.sql.functions.{explode, split}
+
+
 
 //
     val kafkaData = kafka
@@ -60,6 +63,25 @@ object FareSelector {
     //        get_json_object(col("value").cast("string"), "$.EPOCH").alias("epochTime"))
     //      .groupBy(col("origin"),col("dest"), window(col("epochTime").cast("timestamp"), "60 minute"))
     //      .count()
+
+//      .writeStream().foreach(new ForeachWriter[org.apache.spark.sql.Row]() {
+//      @Override
+//      def open(partitionId: Long, version: Long) {
+//        println("Open Connection")
+//        true
+//      }
+//      @Override
+//      def process(record: org.apache.spark.sql.Row) = {
+//        println(s"Process $record")
+//
+//      }
+//      @Override
+//      def close(errorOrNull: Throwable) {
+//
+//      }
+
+
+//    })
 
     kafkaData.writeStream.outputMode("append").format("console").option("truncate", false).start().awaitTermination()
 
