@@ -13,10 +13,10 @@ import org.apache.spark.sql.streaming.DataStreamReader
 object FareSelector {
   val sparkConf = new SparkConf()
     .setMaster("local[2]")
-    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
+//    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
     .setAppName("Flight to DB")
-    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092,ec2-34-234-235-148.compute-1.amazonaws.com:9092")
-    .set("spark.redis.host", "ec2-54-227-20-247.compute-1.amazonaws.com")
+    .set("spark.kafka.brokers","ec2-18-211-107-25.compute-1.amazonaws.com:9092")
+    .set("spark.redis.host", "ec2-3-86-129-28.compute-1.amazonaws.com")
     .set("spark.redis.port", "6379")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
@@ -35,7 +35,7 @@ object FareSelector {
   val kafka = spark.readStream
     .format("kafka")
     .option("kafka.bootstrap.servers", sparkConf.get("spark.kafka.brokers"))
-    .option("subscribe", "flights")
+    .option("subscribe", "april")
     .option("startingOffsets", "latest")
     .load()
 
@@ -82,14 +82,14 @@ object FareSelector {
 //    val redisDB = ("127.0.0.1", 6379)
 //    sc.toRedisZSET(kafkaData, "flights", 600)
 
-    kafkaData
-        .write
+//    kafkaData
+//        .write
 //        .writeStream
-      .format("org.apache.spark.sql.redis")
-      .option("table", "flights")
-      .option("key.column", kafkaData.hashCode())
+//      .format("org.apache.spark.sql.redis")
+//      .option("table", "flights")
+//      .option("key.column", kafkaData.hashCode())
 //      .start()
-      .save()
+//      .save()
 
 //    val count = kafka.select(get_json_object(col("value").cast("string"), "$.FARE").alias("fare")).count()
 

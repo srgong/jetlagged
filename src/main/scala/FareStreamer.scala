@@ -20,7 +20,7 @@ object FareStreamer {
   import org.apache.kafka.clients.producer.ProducerRecord
 
   def main(args: Array[String]): Unit = {
-    val broker = sparkConf.get("spark.kafka.consumer") //"127.0.0.1:9092"
+    val broker = sparkConf.get("spark.kafka.producer") //"127.0.0.1:9092"
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
       val properties = new Properties()
@@ -38,7 +38,7 @@ object FareStreamer {
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
       eachPartition.toList.foreach { eachElement => {
-        val kMessage = new ProducerRecord[String, String]("flights", null, eachElement.toString())
+        val kMessage = new ProducerRecord[String, String]("april", null, eachElement.toString())
         kProducer.send(kMessage)
       }}}
     }
