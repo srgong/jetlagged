@@ -31,8 +31,8 @@ object FareStreamer {
       //    properties.put("buffer.memory", 33554432)
     }
 
-    val filepath = sparkConf.get("spark.hdfs.hostport")
-    val df = sqlContext.read.json("hdfs://"+filepath+"/json").rdd
+    val filepath = sparkConf.get("spark.hdfs.filepath")
+    val df = sqlContext.read.json(filepath).rdd
 
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
