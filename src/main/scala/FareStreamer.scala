@@ -33,7 +33,8 @@ object FareStreamer {
       //    properties.put("buffer.memory", 33554432)
     }
 
-    val df = sqlContext.read.json("src/main/resources/json").rdd
+//    val df = sqlContext.read.json("src/main/resources/json").rdd
+    val df = sqlContext.read.json("hdfs://ec2-18-211-107-25.compute-1.amazonaws.com:9000/json").rdd
 
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
