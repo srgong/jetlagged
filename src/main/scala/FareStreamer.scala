@@ -9,9 +9,7 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
   */
 object FareStreamer {
   val sparkConf = new SparkConf()
-    .setMaster("local[2]")
     .setAppName("Fare Streamer")
-    .set("spark.kafka.producer","ec2-18-211-107-25.compute-1.amazonaws.com:9092")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
     val sqlContext: SQLContext = spark.sqlContext
@@ -33,7 +31,8 @@ object FareStreamer {
       //    properties.put("buffer.memory", 33554432)
     }
 
-    val df = sqlContext.read.json("src/main/resources/json").rdd
+    val filepath = sparkConf.get("spark.hdfs.hostport")
+    val df = sqlContext.read.json("hdfs://"+filepath+"/json").rdd
 
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)

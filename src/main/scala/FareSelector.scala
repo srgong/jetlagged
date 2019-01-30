@@ -6,8 +6,7 @@ import org.apache.spark.sql.{SparkSession}
   */
 object FareSelector {
   val sparkConf = new SparkConf()
-    .setMaster("local[2]")
-//    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
+    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
     .setAppName("Flight to DB")
     .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092,ec2-34-234-235-148.compute-1.amazonaws.com:9092")
     .set("spark.redis.host", "ec2-3-86-129-28.compute-1.amazonaws.com")
