@@ -37,7 +37,8 @@ object FareStreamer {
 
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
-      eachPartition.toList.foreach { eachElement => {
+      eachPartition.foreach { eachElement => {
+        println(eachElement)
         val kMessage = new ProducerRecord[String, String]("april", null, eachElement.toString())
         kProducer.send(kMessage)
       }}}
