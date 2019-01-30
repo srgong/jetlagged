@@ -12,6 +12,8 @@ object FareStreamer {
     .setMaster("local[2]")
     .setAppName("Fare Streamer")
     .set("spark.kafka.producer","ec2-18-211-107-25.compute-1.amazonaws.com:9092")
+    .set("spark.hdfs.abspath", "src/main/resources/json")
+//    .set("spark.hdfs.abspath", "hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/json")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
     val sqlContext: SQLContext = spark.sqlContext
@@ -34,7 +36,8 @@ object FareStreamer {
     }
 
 //    val df = sqlContext.read.json("src/main/resources/json").rdd
-    val df = sqlContext.read.json("hdfs://ec2-18-211-107-25.compute-1.amazonaws.com:9000/json").rdd
+    val hdfsFilePath = sparkConf.get("spark.hdfs.abspath")
+    val df = sqlContext.read.json(hdfsFilePath).rdd
 
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)

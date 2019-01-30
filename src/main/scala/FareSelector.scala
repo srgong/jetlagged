@@ -50,22 +50,26 @@ object FareSelector {
 //       .groupBy(col("key")).agg(min(col("fare")).as("best_fare"), avg(col("fare")).as("avg_cost"), count(col("fare")).as("num_of_flights"))
       .select("key","fare","processingTime")
 
-//     kafkaData
-//     .writeStream
-//     .outputMode("append")
-//     .format("console")
-//     .option("truncate", false)
-////     .trigger(Trigger.ProcessingTime("5 seconds"))
-//     .start()
-//     .awaitTermination()
-//
-    val sink = kafkaData
-      .writeStream
-//      .outputMode("complete")
-      .foreach(new RedisSink)
-      .queryName("Spark Struc Stream to Redis")
-      .start()
+//    val kafkaData = kafka.map{ x=>
+//      (x(0).toString, x(1).toString.toDouble)
+//    }.reduce((a,b) => if(a._2 < b._2) a else b)
 
-    sink.awaitTermination()
+     kafkaData
+     .writeStream
+     .outputMode("append")
+     .format("console")
+     .option("truncate", false)
+//     .trigger(Trigger.ProcessingTime("5 seconds"))
+     .start()
+     .awaitTermination()
+//
+//    val sink = kafkaData
+//      .writeStream
+////      .outputMode("complete")
+//      .foreach(new RedisSink)
+//      .queryName("Spark Struc Stream to Redis")
+//      .start()
+
+//    sink.awaitTermination()
   }
 }
