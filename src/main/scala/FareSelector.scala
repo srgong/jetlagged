@@ -11,21 +11,23 @@ import org.apache.spark.sql.streaming.DataStreamReader
 /**
   * Created by Sharon on 1/20/19.
   */
-object FareSelector {
-  val sparkConf = new SparkConf()
-    .setMaster("local[2]")
+object FareSelector extends SparkSessionBuilder{
+  val spark = buildSparkSession
+
+//  val sparkConf = new SparkConf()
+//    .setMaster("local[2]")
 //    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
-    .setAppName("Flight to DB")
-    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092,ec2-34-234-235-148.compute-1.amazonaws.com:9092")
-    .set("spark.redis.host", "ec2-3-86-129-28.compute-1.amazonaws.com")
-    .set("spark.redis.port", "6379")
-    .set("spark.worker.memory", "6g")
-    .set("spark.executor.memory", "3g")
-    .set("spark.executor.cores", "2")
-    .set("spark.worker.cores", "1")
-  val spark: SparkSession =
-    SparkSession.builder().config(sparkConf).getOrCreate()
-  val sc: SparkContext = spark.sparkContext
+//    .setAppName("Flight to DB")
+//    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092,ec2-34-234-235-148.compute-1.amazonaws.com:9092")
+//    .set("spark.redis.host", "ec2-3-86-129-28.compute-1.amazonaws.com")
+//    .set("spark.redis.port", "6379")
+//    .set("spark.worker.memory", "6g")
+//    .set("spark.executor.memory", "3g")
+//    .set("spark.executor.cores", "2")
+//    .set("spark.worker.cores", "1")
+//  val spark: SparkSession =
+//    SparkSession.builder().config(sparkConf).getOrCreate()
+//  val sc: SparkContext = spark.sparkContext
 
 
 //  val kafkaParams = Map[String, Object](
@@ -39,7 +41,7 @@ object FareSelector {
 
   val kafka = spark.readStream
     .format("kafka")
-    .option("kafka.bootstrap.servers", sparkConf.get("spark.kafka.brokers"))
+    .option("kafka.bootstrap.servers", "ec2-18-211-110-36.compute-1.amazonaws.com:9092,ec2-34-234-235-148.compute-1.amazonaws.com:9092")
     .option("subscribe", "april")
     .option("startingOffsets", "latest")
     .load()
@@ -64,23 +66,29 @@ object FareSelector {
         unix_timestamp().as("write_time_ms"),
         col("write_time"))
       .withColumn("key",concat(col("origin"), lit("@"),col("dest"),  lit("@"),col("datetime"), lit("@"), col("write_time_ms")))
-//              .groupBy(col("key")).agg(min(col("fare")).as("best_fare"), avg(col("fare")).as("avg_cost"), count(col("fare")).as("num_of_flights"))
-//      .select("key","fare").as[String]
+//       .groupBy(col("key")).agg(min(col("fare")).as("best_fare"), avg(col("fare")).as("avg_cost"), count(col("fare")).as("num_of_flights"))
+      .select("key","fare")
 
 
-        kafkaData.writeStream.outputMode("append").format("console").option("truncate", false).trigger(Trigger.ProcessingTime("5 seconds")).start().awaitTermination()
+//        kafkaData.writeStream.outputMode("append").format("console").option("truncate", false).trigger(Trigger.ProcessingTime("5 seconds")).start().awaitTermination()
 
 
 
-//    kafkaData
-//        .write
-//        .writeStream
+    val sink = kafkaData
+      .writeStream
+//      .outputMode("complete")
+      .foreach({
+
+      new RedisSink
+    })
+        .queryName("Spark Struc Stream to Redis")
 //      .format("org.apache.spark.sql.redis")
 //      .option("table", "flights")
 //      .option("key.column", kafkaData.hashCode())
-//      .start()
-//      .save()
+      .start()
 
+
+    sink.awaitTermination()
 //    val count = kafka.select(get_json_object(col("value").cast("string"), "$.FARE").alias("fare")).count()
 
 //    val windowfun = kafka.select(get_json_object((col("value")).cast("string"), "$.DEST").alias("dest"), get_json_object((col("value")).cast("timestamp"), "$.timestamp").alias("timestamp"))

@@ -15,8 +15,9 @@ libraryDependencies ++= Seq(
 //  "org.apache.spark" %% "spark-sql" % sparkVersion % "provided",
   "org.apache.spark" % "spark-streaming_2.11" % "2.3.1",
 "org.apache.spark" %% "spark-sql-kafka-0-10" % "2.3.1",
-  "com.redislabs" % "spark-redis" % "2.3.1-M2",
-  "org.apache.kafka" % "kafka-clients" % "1.1.0" excludeAll(excludeJpountz)
+//  "com.redislabs" % "spark-redis" % "2.3.1-M2",
+  "org.apache.kafka" % "kafka-clients" % "1.1.0" excludeAll(excludeJpountz),
+  "net.debasishg" %% "redisclient" % "3.9"
 )
 
 
