@@ -34,11 +34,11 @@ object FareStreamer {
     val filepath = sparkConf.get("spark.hdfs.filepath")
     val df = sqlContext.read.json(filepath).rdd
 
+    val topic = sparkConf.get("spark.kafka.topic")
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
-      eachPartition.foreach { eachElement => {
-        println(eachElement)
-        val kMessage = new ProducerRecord[String, String]("april", null, eachElement.toString())
+      eachPartition.toList.foreach { eachElement => {
+        val kMessage = new ProducerRecord[String, String](topic, null, eachElement.toString())
         kProducer.send(kMessage)
       }}}
     }
