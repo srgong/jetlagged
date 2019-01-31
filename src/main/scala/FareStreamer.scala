@@ -9,20 +9,27 @@ import org.apache.spark.sql.{SQLContext, SparkSession}
   */
 object FareStreamer {
   val sparkConf = new SparkConf()
-    .setMaster("local[2]")
+//    .setMaster("local[2]")
+    .setMaster("spark://ec2-18-211-110-36.compute-1.amazonaws.com:7077")
     .setAppName("Fare Streamer")
     .set("spark.kafka.producer","ec2-18-211-107-25.compute-1.amazonaws.com:9092")
-    .set("spark.hdfs.filepath", "src/main/resources/json")
+//    .set("spark.hdfs.filepath", "src/main/resources/json")
+    .set("spark.hdfs.filepath", "hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/json")
     .set("spark.kafka.topic", "local_december2017")
-//    .set("spark.hdfs.abspath", "hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/json")
+    .set("spark.executor.memory", "4g")
+    .set("spark.driver.memory", "1g")
+    .set("spark.network.timeout", "800")
+    .set("spark.driver.host", "10.0.37.53")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
-    val sqlContext: SQLContext = spark.sqlContext
+
+//    .set("spark.hdfs.abspath", "hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/json")
 
   import org.apache.kafka.clients.producer.KafkaProducer
   import org.apache.kafka.clients.producer.ProducerRecord
 
   def main(args: Array[String]): Unit = {
+    val sqlContext: SQLContext = spark.sqlContext
     val broker = sparkConf.get("spark.kafka.producer") //"127.0.0.1:9092"
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
