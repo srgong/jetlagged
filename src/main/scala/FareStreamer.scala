@@ -12,12 +12,12 @@ object FareStreamer {
     .setAppName("Fare Streamer")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
-    val sqlContext: SQLContext = spark.sqlContext
 
   import org.apache.kafka.clients.producer.KafkaProducer
   import org.apache.kafka.clients.producer.ProducerRecord
 
   def main(args: Array[String]): Unit = {
+    val sqlContext: SQLContext = spark.sqlContext
     val broker = sparkConf.get("spark.kafka.producer") //"127.0.0.1:9092"
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
