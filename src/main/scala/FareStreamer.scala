@@ -43,6 +43,7 @@ object FareStreamer {
     val topic = sparkConf.get("spark.kafka.topic")
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
+      println(kProducer.getClass.toGenericString)
       eachPartition.toList.foreach { eachElement => {
         val kMessage = new ProducerRecord[String, String](topic, null, eachElement.toString())
         kProducer.send(kMessage)
