@@ -39,8 +39,9 @@ object FareStreamer {
       eachPartition.toList.foreach { eachElement => {
         val kMessage = new ProducerRecord[String, String](topic, null, eachElement.toString())
         kProducer.send(kMessage)
-      }}}
-    }
+      }}
+      kProducer.close()
+    }}
   }
 
 }
