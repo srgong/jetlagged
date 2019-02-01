@@ -4,21 +4,22 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{SQLContext, SparkSession}
 
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.apache.kafka.clients.producer.ProducerRecord
+
 /**
   * Created by Sharon on 1/22/19.
   */
 object FareStreamer {
   val sparkConf = new SparkConf()
     .setAppName("Fare Streamer")
-  val spark: SparkSession =
-    SparkSession.builder().config(sparkConf).getOrCreate()
-
-  import org.apache.kafka.clients.producer.KafkaProducer
-  import org.apache.kafka.clients.producer.ProducerRecord
 
   def main(args: Array[String]): Unit = {
+    val spark: SparkSession =
+      SparkSession.builder().config(sparkConf).getOrCreate()
     val sqlContext: SQLContext = spark.sqlContext
-    val broker = sparkConf.get("spark.kafka.producer") //"127.0.0.1:9092"
+
+    val broker = sparkConf.get("spark.kafka.producer")
 
     case class KafkaProducerConfigs(brokerList: String = broker) {
       val properties = new Properties()
