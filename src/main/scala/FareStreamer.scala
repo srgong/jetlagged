@@ -20,13 +20,11 @@ object FareStreamer {
     val sqlContext: SQLContext = spark.sqlContext
 
     val broker = sparkConf.get("spark.kafka.producer")
-
     case class KafkaProducerConfigs(brokerList: String = broker) {
       val properties = new Properties()
       properties.put("bootstrap.servers", brokerList)
       properties.put("key.serializer", classOf[StringSerializer])
       properties.put("value.serializer", classOf[StringSerializer])
-      //    properties.put("serializer.class", classOf[StringDeserializer])
       //    properties.put("batch.size", 16384)
       //    properties.put("linger.ms", 1)
       //    properties.put("buffer.memory", 33554432)
