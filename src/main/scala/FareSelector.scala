@@ -1,22 +1,16 @@
 import org.apache.spark.{SparkConf}
 import org.apache.spark.sql.{SparkSession}
 
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{split}
+
 /**
   * Created by Sharon on 1/20/19.
   */
 object FareSelector {
   val sparkConf = new SparkConf()
-//      .setMaster("local[*]")
-    .setMaster("spark://ec2-3-91-113-70.compute-1.amazonaws.com:7077")
     .setAppName("Flight to DB")
-    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092")
-    .set("spark.redis.host", "ec2-3-86-129-28.compute-1.amazonaws.com")
-    .set("spark.redis.port", "6379")
-    .set("spark.worker.memory", "6g")
-    .set("spark.executor.memory", "3g")
-    .set("spark.executor.cores", "2")
-    .set("spark.worker.cores", "1")
-    .set("spark.kafka.topic", "client_a")
 
   def main(args: Array[String]): Unit = {
     val spark: SparkSession =
@@ -26,12 +20,8 @@ object FareSelector {
       .format("kafka")
       .option("kafka.bootstrap.servers", sparkConf.get("spark.kafka.brokers"))
       .option("subscribe", sparkConf.get("spark.kafka.topic"))
-      .option("startingOffsets", "latest")
+      .option("startingOffsets", "earliest")
       .load()
-
-    import org.apache.spark.sql.types._
-    import org.apache.spark.sql.functions._
-    import org.apache.spark.sql.functions.{split}
 
     val kafkaData = kafka
       .withColumn("Key", col("key").cast(StringType))
@@ -46,9 +36,10 @@ object FareSelector {
         split(col("Value"), ",")(2).as("fare"),
         unix_timestamp().as("processingTime_ms"),
       col("processingTime"))
-      .withColumn("key",concat(col("origin"), lit("@"),col("dest"),  lit("@"),col("datetime"), lit("@"), col("processingTime_ms")))
-       .groupBy(col("key")).agg(min(col("fare")).as("best_fare"), avg(col("fare")).as("avg_cost"), count(col("fare")).as("num_of_flights"))
-      .select("key","fare","processingTime")
+      .withColumn("key",concat(col("origin"), lit("@"),col("dest"),  lit("@"),col("datetime")))
+        .withColumn("field", concat(col("processingTime_ms")))
+       .groupBy(col("key"),col("field")).agg(min(col("fare")).as("best_fare"), avg(col("fare")).as("avg_cost"), count(col("fare")).as("num_of_flights"))
+      .select("key","best_fare")
 
 //     kafkaData
 //     .writeStream
