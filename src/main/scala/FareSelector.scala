@@ -20,7 +20,7 @@ object FareSelector {
       .format("kafka")
       .option("kafka.bootstrap.servers", sparkConf.get("spark.kafka.brokers"))
       .option("subscribe", sparkConf.get("spark.kafka.topic"))
-      .option("startingOffsets", "earliest")
+      .option("startingOffsets", sparkConf.get("spark.kafka.startingOffsets"))
       .load()
 
     val kafkaData = kafka

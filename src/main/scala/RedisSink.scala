@@ -6,8 +6,14 @@ import org.apache.spark.sql.{ForeachWriter}
   */
 
 object RedisConnection extends Serializable {
-  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+  lazy val client = new ThreadLocal[RedisClient]() {
+    override def initialValue(): RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+  }
+
+//  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
 }
+
+
 
 class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
 {
@@ -36,7 +42,7 @@ class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
       */
     def process(record: org.apache.spark.sql.Row): Unit = {
       println(s"Process $record")
-      RedisConnection.conn.set(record(0), record(1))
+      RedisConnection.client.initialValue().set(record(0), record(1))
     }
 
     /**
