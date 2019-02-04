@@ -51,14 +51,15 @@ object FareSelector {
 //     .awaitTermination()
 
 
-    val clients = new RedisClientPool("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+//    val clients = new RedisClientPool("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
     val sink = kafkaData
       .writeStream
       .outputMode("complete")
       .foreach({
-        clients.withClient({ client =>
-          new RedisSink(client)
-        })
+//        clients.withClient({ client =>
+//          new RedisSink(client)
+          new RedisSink
+//        })
       })
       .queryName("Spark Struc Stream to Redis")
       .start()

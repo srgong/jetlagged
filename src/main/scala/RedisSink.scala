@@ -6,14 +6,14 @@ import org.apache.spark.sql.ForeachWriter
   */
 
 object RedisConnection extends Serializable {
-  val clients = new RedisClientPool("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
-
-//  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+//  val clients = new RedisClientPool("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+//
+  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
 }
 
 
 
-class RedisSink(redisClient: RedisClient) extends ForeachWriter[org.apache.spark.sql.Row]
+class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
 {
     /**
       * Called when starting to process one partition of new data in the executor. The `version` is
@@ -41,7 +41,7 @@ class RedisSink(redisClient: RedisClient) extends ForeachWriter[org.apache.spark
       */
     def process(record: org.apache.spark.sql.Row): Unit = {
       println(s"Process $record")
-      redisClient.set(record(0), record(1))
+      RedisConnection.conn.set(record(0), record(1))
     }
 
     /**
