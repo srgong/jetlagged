@@ -5,13 +5,12 @@ import org.apache.spark.sql.ForeachWriter
   * Created by Sharon on 1/25/19.
   */
 
-object RedisConnection extends Serializable {
+class RedisConnection extends Serializable {
 //  val clients = new RedisClientPool("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
 //
-  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+//  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+   val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
 }
-
-
 
 class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
 {
@@ -30,7 +29,7 @@ class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
       *         indicates the partition should be skipped.
       */
 
-//    val r = RedisConnection
+    val r = new RedisConnection
     def open(partitionId: Long, version: Long): Boolean = {
       println("Open Connection")
       true
@@ -41,7 +40,7 @@ class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
       */
     def process(record: org.apache.spark.sql.Row): Unit = {
       println(s"Process $record")
-      RedisConnection.conn.set(record(0), record(1))
+      r.conn.set(record(0), record(1))
     }
 
     /**
