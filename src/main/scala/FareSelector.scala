@@ -1,4 +1,4 @@
-import com.redis.RedisClient
+import com.redis.{RedisClient, RedisClientPool}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
@@ -50,11 +50,15 @@ object FareSelector {
 //     .start()
 //     .awaitTermination()
 
+
+    val clients = new RedisClientPool("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
     val sink = kafkaData
       .writeStream
       .outputMode("complete")
       .foreach({
-        new RedisSink
+        clients.withClient({ client =>
+          new RedisSink(client)
+        })
       })
       .queryName("Spark Struc Stream to Redis")
       .start()
