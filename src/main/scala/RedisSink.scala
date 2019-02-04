@@ -6,11 +6,7 @@ import org.apache.spark.sql.{ForeachWriter}
   */
 
 object RedisConnection extends Serializable {
-  lazy val client = new ThreadLocal[RedisClient]() {
-    override def initialValue(): RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
-  }
-
-//  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
+  lazy val conn: RedisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
 }
 
 
@@ -32,6 +28,7 @@ class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
       *         indicates the partition should be skipped.
       */
 
+    val r = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
     def open(partitionId: Long, version: Long): Boolean = {
       println("Open Connection")
       true
@@ -42,7 +39,7 @@ class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
       */
     def process(record: org.apache.spark.sql.Row): Unit = {
       println(s"Process $record")
-      RedisConnection.client.initialValue().set(record(0), record(1))
+      r.set(record(0), record(1))
     }
 
     /**

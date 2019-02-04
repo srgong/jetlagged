@@ -1,9 +1,9 @@
-import org.apache.spark.{SparkConf}
-import org.apache.spark.sql.{SparkSession}
-
+import com.redis.RedisClient
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.functions.{split}
+import org.apache.spark.sql.functions.split
 
 /**
   * Created by Sharon on 1/20/19.
@@ -53,7 +53,9 @@ object FareSelector {
     val sink = kafkaData
       .writeStream
       .outputMode("complete")
-      .foreach(new RedisSink)
+      .foreach({
+        new RedisSink
+      })
       .queryName("Spark Struc Stream to Redis")
       .start()
 
