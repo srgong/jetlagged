@@ -1,7 +1,9 @@
 body {
   padding-top: 50px;
+  margin: auto;
+  width: 75%;
 }
+
 .starter-template {
   padding: 40px 15px;
-  text-align: center;
 }
