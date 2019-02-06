@@ -16,7 +16,7 @@ def before_request():
     g.db = init_db()
 
 @app.route('/')
-@app.route('/input')
+@app.route('/index')
 def flights_input():
     # LAX@SLC@2017-12-01T06:30:00.000-05:00
     keys = g.db.keys("*")
@@ -28,9 +28,10 @@ def flights_input():
         # print flight
     for key in keys:
         print key
-        flights.append(key.split("@"))
+        # flights.append(key.split("@"))
         # dict(key.split('@')
-    return render_template("output.html", flights = flights)
+    # return render_template("output.html", flights = flights)
+    return render_template("index.html")
 
 @app.route('/output')
 def flights_output():
