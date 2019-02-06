@@ -2,7 +2,7 @@ from flask import render_template
 from flask import g
 from flask import request
 import redis
-from jetlaggedio import app
+from jetlagged import app
 
 def init_db():
     db = redis.StrictRedis(
