@@ -17,7 +17,6 @@ object FareSelector {
     val spark: SparkSession =
       SparkSession.builder().config(sparkConf).getOrCreate()
 
-
     val kafka = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", sparkConf.get("spark.kafka.brokers"))
@@ -46,7 +45,7 @@ object FareSelector {
     val sink = kafkaData
       .writeStream
       .outputMode("complete")
-        .foreach(new RedisSink())
+      .foreach(new RedisSink)
       .queryName("Spark Struc Stream to Redis")
       .start()
 

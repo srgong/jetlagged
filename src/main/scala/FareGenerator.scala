@@ -12,6 +12,8 @@ object FareGenerator {
   val sparkConf = new SparkConf()
     .setMaster("local[2]")
     .setAppName("Fare Generator")
+    .set("spark.file.in", "src/main/resources/csv/201803.csv")
+    .set("spark.file.out", "src/main/resources/json/201803/")
   val spark: SparkSession =
     SparkSession.builder().config(sparkConf).getOrCreate()
   val sqlContext: SQLContext = spark.sqlContext
@@ -27,10 +29,9 @@ object FareGenerator {
     * @param path
     */
   def save(df: DataFrame, path: String) = {
-    df.write.format("json").save(path)
-//    df.write.format("avro").save(path)
+//    df.write.format("json").save(path)
+    df.write.format("avro").save(path)
   }
-
 
   /**
     * Replicates same flight information (to/from/when)
@@ -77,19 +78,23 @@ object FareGenerator {
     * @return
     */
   def getEpoch(df: DataFrame): DataFrame = {
-    val withTime = df.withColumn("TIME", concat(col("FL_DATE"),lit(" "),col("CRS_DEP_TIME")))
-    val withEpoch = withTime.withColumn("EPOCH",unix_timestamp(col("time"),"yyyy-MM-dd HHmm"))
-    withEpoch.withColumn("TIMESTAMP",to_timestamp(col("EPOCH")))
+    val withTime = df.withColumn("time", concat(col("FL_DATE"),lit(" "),col("CRS_DEP_TIME")))
+    val withEpoch = withTime.withColumn("EPOCH",unix_timestamp(col("time"),"YYYY-MM-DD HHmm")).filter("EPOCH is not null")
+    val withFutureDates = withEpoch.withColumn("datetime_ms", add_months(col("EPOCH"),12))
+    withFutureDates.withColumn("datetime",to_timestamp(col("UPCOMING")))
+      .withColumnRenamed("FL_DATE","date")
+      .withColumnRenamed("ORIGIN","from")
+      .withColumnRenamed("DEST","to")
   }
 
   def main(args: Array[String]): Unit = {
-    val df = sqlContext.read.option("header", "true").csv("src/main/resources/in")
-    val withEpoch = getEpoch(df).filter("EPOCH is not null").select("EPOCH","TIMESTAMP","ORIGIN","DEST")
-//    println(withEpoch.count) 464,205
+    val df = sqlContext.read.option("header", "true").csv(sparkConf.get("spark.file.in"))
+    val withEpoch = getEpoch(df).select("datetime_ms","datetime","date", "from","to")
+    println(withEpoch.count) //464,205
     val withReplication = replicate(withEpoch,100)
     val withFare = generateFare(withReplication)
     //println(withFare.count) 45,956,295
-    save(withFare, "src/main/resources/json/")
+    save(withFare, sparkConf.get("spark.file.out"))
   }
 
 }
