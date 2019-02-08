@@ -25,8 +25,8 @@ object FareStreamer {
       properties.put("bootstrap.servers", brokerList)
       properties.put("key.serializer", classOf[StringSerializer])
       properties.put("value.serializer", classOf[StringSerializer])
-      //    properties.put("batch.size", 16384)
-      //    properties.put("linger.ms", 1)
+      properties.put("linger.ms", "100")
+//          properties.put("batch.size", 16384)
       //    properties.put("buffer.memory", 33554432)
     }
 
@@ -37,7 +37,8 @@ object FareStreamer {
     df.foreachPartition { eachPartition => {
       val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
       eachPartition.toList.foreach { eachElement => {
-        val kMessage = new ProducerRecord[String, String](topic, null, eachElement.toString())
+        val pricing_time = (System.currentTimeMillis / 1000).toString
+        val kMessage = new ProducerRecord[String, String](topic, null, eachElement.toString().concat(pricing_time))
         kProducer.send(kMessage)
       }}
       kProducer.close()
