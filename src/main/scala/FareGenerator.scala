@@ -121,11 +121,13 @@ object FareGenerator {
     val withLayover = findLayovers(withTime, maxLayoverHours = 3)
     val withLayoverReplication = replicate(withLayover,5)
     val withLayoverFare = generateFare(df = withLayoverReplication, min_fare = 100, max_fare = 350, mean = 253, stddev = 60)
+    withLayoverFare.cache()
     save(withLayoverFare, sparkConf.get("spark.file.layover"))
 
     val withReplication = replicate(withTime.drop("dep_datetime","arr_datetime"),10)
     val withDirectFare = generateFare(df = withReplication,  min_fare = 350, max_fare = 700, mean = 353, stddev = 60)
-    save(withDirectFare.withColumn("last",lit("None")), sparkConf.get("spark.file.direct"))
+    withDirectFare.withColumn("last",lit("None")).cache
+    save(withDirectFare, sparkConf.get("spark.file.direct"))
   }
 
 }
