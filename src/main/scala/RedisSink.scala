@@ -1,11 +1,13 @@
-import com.redis.{RedisClient}
+
+import com.redis.RedisClient
+import model.Flight
 import org.apache.spark.sql.ForeachWriter
 
 /**
   * Created by Sharon on 1/25/19.
   */
 
-class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
+class RedisSink extends ForeachWriter[Flight]
 {
     /**
       * Called when starting to process one partition of new data in the executor. The `version` is
@@ -30,10 +32,21 @@ class RedisSink extends ForeachWriter[org.apache.spark.sql.Row]
       * Called to process the data in the executor side. This method will be called only when `open`
       * returns `true`.
       */
-    def process(record: org.apache.spark.sql.Row): Unit = {
-      println(s"Process $record")
+    def process(flight: Flight): Unit = {
+      println(s"Process $flight")
       val redisClient: RedisClient =  new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
-      redisClient.set(record(0), record(1))
+      val delim = "@"
+      val key = "date="+flight.date + delim + "from="+flight.from + delim + "to="+flight.to
+//      val field = Map("fare" -> flight.fare,
+//        "last_leg" -> flight.last_to,
+//        "updated_ms" -> flight.updated_ms,
+//        "processed_ms" -> flight.processed_ms
+//      )
+      val k = "last_leg="+flight.last_to+delim+"time="+flight.time
+      val v = "fare="+flight.fare+delim+"processed_ms="+flight.processed_ms
+      val field = Map(k -> v)
+      redisClient.hmset(key, field)
+      redisClient.expire(key, 600) // set TTL to 10 minutes
     }
 
     /**

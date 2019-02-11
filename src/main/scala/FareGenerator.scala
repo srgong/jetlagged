@@ -7,14 +7,12 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions._
 
 object FareGenerator {
-  case class Flight(origin: String, destination: String, fare: Double)
 
   val sparkConf = new SparkConf()
     .setAppName("Fare Generator")
 //    .setMaster("local[*]")
 //    .set("spark.file.in", "src/main/resources/csv/small.csv")
-//    .set("spark.file.direct", "src/main/resources/avro/direct/")
-//    .set("spark.file.layover", "src/main/resources/avro/layover/")
+//    .set("spark.file.flights", "src/main/resources/json/sample/")
 
   /**
     * Converts csv to json.
@@ -22,8 +20,8 @@ object FareGenerator {
     * @param path
     */
   def save(df: DataFrame, path: String) = {
-    df.repartition(255).write.mode(SaveMode.Overwrite).format("com.databricks.spark.avro").save(path)
-//    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
+    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
+//    df.write.mode(SaveMode.Overwrite).format("json").save(path)
   }
 
   /**
@@ -55,7 +53,7 @@ object FareGenerator {
     */
   def generateFare(df: DataFrame, min_fare: Int, max_fare: Int, mean: Int, stddev: Int): DataFrame = {
     val withFare = df.withColumn("RIGHTSKEWDISTR", round(randn(seed=10)*stddev+mean,2))
-    withFare.withColumn("FARE",
+    withFare.withColumn("fare",
       when(col("RIGHTSKEWDISTR") < min_fare, scala.util.Random.nextInt(100) + min_fare)
         .when(col("RIGHTSKEWDISTR") > max_fare, max_fare)
         .otherwise(col("RIGHTSKEWDISTR")))
@@ -71,8 +69,8 @@ object FareGenerator {
     df.withColumn("date", date_format(add_months(to_timestamp(col("FL_DATE"), "yyyy-MM-dd"),13), "MM-dd-yyyy"))
       .withColumn("dep_datetime",to_timestamp(concat(col("date"),lit(" "), col("CRS_DEP_TIME")),"MM-dd-yyyy HHmm"))
       .withColumn("arr_datetime",to_timestamp(concat(col("date"),lit(" "), col("CRS_ARR_TIME")),"MM-dd-yyyy HHmm"))
-      .withColumn("time", concat(hour(col("dep_datetime")), lit(":"), minute(col("dep_datetime")), lit("-"),
-        hour(col("arr_datetime")), lit(":"), minute(col("arr_datetime"))))
+      .withColumn("time", concat(substring(col("CRS_DEP_TIME"),0,2), lit(":"), substring(col("CRS_DEP_TIME"),3,2), lit("-"),
+        substring(col("CRS_ARR_TIME"),0,2), lit(":"), substring(col("CRS_ARR_TIME"),3,2)))
       .withColumnRenamed("ORIGIN","from")
       .withColumnRenamed("DEST","to")
       .select("date","time","from","to","dep_datetime","arr_datetime")
@@ -121,13 +119,14 @@ object FareGenerator {
     val withLayover = findLayovers(withTime, maxLayoverHours = 3)
     val withLayoverReplication = replicate(withLayover,5)
     val withLayoverFare = generateFare(df = withLayoverReplication, min_fare = 100, max_fare = 350, mean = 253, stddev = 60)
-    withLayoverFare.cache()
-    save(withLayoverFare, sparkConf.get("spark.file.layover"))
 
     val withReplication = replicate(withTime.drop("dep_datetime","arr_datetime"),10)
-    val withDirectFare = generateFare(df = withReplication,  min_fare = 350, max_fare = 700, mean = 353, stddev = 60)
-    withDirectFare.withColumn("last",lit("None")).cache
-    save(withDirectFare, sparkConf.get("spark.file.direct"))
+    val withNormalisedCols = withReplication.withColumn("last",lit("None")).withColumn("last_time",lit("None"))
+    val withDirectFare = generateFare(df = withNormalisedCols,  min_fare = 350, max_fare = 700, mean = 353, stddev = 60)
+
+    val flights = withLayoverFare.union(withDirectFare)
+    flights.cache
+    save(flights, sparkConf.get("spark.file.flights"))
   }
 
 }
