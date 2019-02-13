@@ -13,9 +13,9 @@ object FareStreamer {
   val sparkConf = new SparkConf()
     .setAppName("Fare Streamer")
 //    .setMaster("local[*]")
-//    .set("spark.hdfs.flights","src/main/resources/part-00399")
+//    .set("spark.hdfs.in","src/main/resources/part-00399")
 //    .set("spark.kafka.producer","ec2-18-211-110-36.compute-1.amazonaws.com:9092")
-//    .set("spark.kafka.topic","local_g")
+//    .set("spark.kafka.topic","local_h")
 
 
   def main(args: Array[String]): Unit = {
@@ -32,7 +32,7 @@ object FareStreamer {
     }
 
     val topic = sparkConf.get("spark.kafka.topic")
-    val ds = sc.textFile(sparkConf.get("spark.hdfs.flights"))
+    val ds = sc.textFile(sparkConf.get("spark.hdfs.in"))
 
     while(true) {
       ds.foreachPartition { eachPartition => {

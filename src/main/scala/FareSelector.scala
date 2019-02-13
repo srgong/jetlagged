@@ -4,6 +4,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.split
+import org.apache.spark.sql.streaming.Trigger
 
 /**
   * Created by Sharon on 1/20/19.
@@ -13,7 +14,7 @@ object FareSelector {
     .setAppName("Flight to DB")
 //    .setMaster("local[*]")
 //    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092")
-//    .set("spark.kafka.topic","local_g")
+//    .set("spark.kafka.topic","local_h")
 //    .set("spark.kafka.startingOffsets","earliest")
 
   def main(args: Array[String]): Unit = {
@@ -46,6 +47,7 @@ object FareSelector {
       .writeStream
       .outputMode("append")
       .foreach(new RedisSink)
+      .trigger(Trigger.Continuous("1 second"))
       .queryName("Spark Struc Stream to Redis")
       .start()
 
