@@ -3,7 +3,7 @@
   */
 
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode, SparkSession}
-import org.apache.spark.SparkConf
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.functions._
 
 object FareGenerator {
@@ -11,17 +11,17 @@ object FareGenerator {
   val sparkConf = new SparkConf()
     .setAppName("Fare Generator")
 //    .setMaster("local[*]")
-//    .set("spark.file.in", "src/main/resources/csv/small.csv")
-//    .set("spark.file.flights", "src/main/resources/json/sample/")
+//    .set("spark.file.in", "src/main/resources/csv/201803.csv")
+//    .set("spark.file.flights", "src/main/resources/json/")
 
   /**
-    * Converts csv to json.
+    * Saves to hdfs as text file.
     * @param df
     * @param path
     */
   def save(df: DataFrame, path: String) = {
-    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
-//    df.write.mode(SaveMode.Overwrite).format("json").save(path)
+    df.rdd.saveAsTextFile(path)
+//    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
   }
 
   /**

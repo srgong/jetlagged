@@ -1,9 +1,8 @@
 import java.util.Properties
 
 import org.apache.kafka.common.serialization.StringSerializer
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.{SQLContext, SparkSession}
-
+import org.apache.spark.{SparkConf}
+import org.apache.spark.sql.{SparkSession}
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 
@@ -22,7 +21,7 @@ object FareStreamer {
   def main(args: Array[String]): Unit = {
     val spark: SparkSession =
       SparkSession.builder().config(sparkConf).getOrCreate()
-    val sqlContext: SQLContext = spark.sqlContext
+    val sqlContext = spark.sqlContext
 
     val broker = sparkConf.get("spark.kafka.producer")
     case class KafkaProducerConfigs(brokerList: String = broker) {
