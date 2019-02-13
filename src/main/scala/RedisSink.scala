@@ -37,12 +37,7 @@ class RedisSink extends ForeachWriter[Flight]
       val redisClient: RedisClient =  new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
       val delim = "@"
       val key = "date="+flight.date + delim + "from="+flight.from + delim + "to="+flight.to
-//      val field = Map("fare" -> flight.fare,
-//        "last_leg" -> flight.last_to,
-//        "updated_ms" -> flight.updated_ms,
-//        "processed_ms" -> flight.processed_ms
-//      )
-      val k = "last_leg="+flight.last_to+delim+"time="+flight.time
+      val k = "last_leg="+flight.last_to+delim//+"time="+flight.time
       val v = "fare="+flight.fare+delim+"processed_ms="+flight.updated_ms
       val field = Map(k -> v)
       redisClient.hmset(key, field)

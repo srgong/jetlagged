@@ -90,7 +90,8 @@ object FareGenerator {
       .withColumnRenamed("time","last_time")
 
     val layovers = flightA.join(flightB, flightA("first_to") === flightB("last_from")
-        && flightA("date") === flightB("date")).drop(flightB("date"))
+        && flightA("date") === flightB("date")
+        && flightA("first_to") != flightB("last_to")).drop(flightB("date"))
       .withColumn("layoverHours", (((unix_timestamp(col("last_dep_time"))) -
         unix_timestamp(col("first_arr_time"))) / 3600000))
       .filter(col("layoverHours") <= maxLayoverHours && col("layoverHours") > 0)
