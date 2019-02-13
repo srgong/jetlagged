@@ -51,7 +51,8 @@
         </div>
 
         <div>
-          <button formaction="http://jetlagged.xyz/output" type="submit" class="btn btn-default btn-lg">Search</button>
+          <button type="submit" class="btn btn-default btn-lg">Search</button>
+          <!-- <button formaction="http://jetlagged.xyz/output" type="submit" class="btn btn-default btn-lg">Search</button> -->
         </div>
 
       </form>
@@ -70,9 +71,9 @@
     <div class="container">
 
       <table class="table table-hover">
-        <tr><th>Date</th><th>Flight</th><th>Last Leg</th><th>Fare</th><th>Purchase</th></tr>
+        <tr><th>Last checked</th><th>Date</th><th>Flight</th><th>Last Leg</th><th>Direct Fare</th><th>Purchase</th></tr>
         {% for flight in flights %}
-        <tr><td>{{ flight['date'] }}</td><td>{{ flight['key']}}</td><td>{{ flight['last_leg']}}</td><td> {{ flight['fare'] }}</td><td><a href="www.google.com/flights">Buy</a></td></tr>
+        <tr><td> {{ flight['freshness'] }} secs ago</td><td>{{ args['date'] }}</td><td>{{ args['from'] }}->{{ args['to'] }}</td><td>{{ flight['last_leg']}}</td><td> {{ flight['fare'] }}</td><td><a href="www.google.com/flights">Buy</a></td></tr>
         {% endfor %}
       </table>
 

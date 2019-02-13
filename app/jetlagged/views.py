@@ -2,6 +2,7 @@ from flask import render_template
 from flask import g
 from flask import request
 import redis
+from datetime import datetime
 from jetlagged import app
 
 def init_db():
@@ -15,22 +16,14 @@ def init_db():
 def before_request():
     g.db = init_db()
 
+@app.context_processor
+def inject_now():
+    return {'now': datetime.utcnow().strftime("%s")}
+
 @app.route('/')
 @app.route('/index')
 def flights_input():
-    # LAX@SLC@2017-12-01T06:30:00.000-05:00
-    # keys = g.db.keys("*")
     flights = []
-    # a = [ 'abc=lalalla', 'appa=kdkdkdkd', 'kkakaka=oeoeoeo']
-    # flights = dict(s.split('@') for s in keys)
-    # print d
-    # for flight in flights:
-        # print flight
-    # for key in keys:
-        # print key
-        # flights.append(key.split("@"))
-        # dict(key.split('@')
-    # return render_template("output.html", flights = flights)
     return render_template("index.html")
 
 @app.route('/output')
@@ -39,7 +32,16 @@ def flights_output():
     origin = request.args.get('from')
     date = request.args.get('date')
     args = {'to': dest, 'from': origin, 'date': date}
-    fare = g.db.get(origin+"@"+dest+"@"+date)
-    # fare = g.db.hgetall(origin+"@"+dest+"@"+date)
-    flights = {'key': origin+'->'+dest,'last_leg': 'JFK','fare': fare,'date': date}
-    return render_template("output.html", args = args, flights = [flights])
+    getkey = 'date='+date+'@from='+origin+"@to="+dest
+    fields = g.db.hgetall(getkey)
+    flights = []
+    for field in fields:
+        key = field.split('@')
+        value = fields[field].split('@')
+        fieldKey = dict(k.split('=') for k in key)
+        valueKey = dict(v.split('=') for v in value)
+        flight = dict(fieldKey.items() + valueKey.items())
+        flight['freshness'] = ( int(datetime.utcnow().strftime("%s")) - int(flight['processed_ms']) )
+        flights.append(flight)
+        print flight
+    return render_template("output.html", args = args, flights = flights, animation_time="30")
