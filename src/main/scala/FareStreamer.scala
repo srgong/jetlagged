@@ -22,6 +22,7 @@ object FareStreamer {
     val spark: SparkSession =
       SparkSession.builder().config(sparkConf).getOrCreate()
     val sqlContext = spark.sqlContext
+//    val sc = spark.sparkContext
 
     val broker = sparkConf.get("spark.kafka.producer")
     case class KafkaProducerConfigs(brokerList: String = broker) {
@@ -33,6 +34,7 @@ object FareStreamer {
 
     val topic = sparkConf.get("spark.kafka.topic")
     val ds = sqlContext.read.json(sparkConf.get("spark.hdfs.flights"))
+//    val ds = sc.textFile(sparkConf.get("spark.hdfs.flights"))
 
     while(true) {
       ds.foreachPartition { eachPartition => {

@@ -15,13 +15,14 @@ object FareGenerator {
 //    .set("spark.file.flights", "src/main/resources/json/")
 
   /**
-    * Saves to hdfs as text file.
+    * Converts csv to json.
     * @param df
     * @param path
     */
   def save(df: DataFrame, path: String) = {
-    df.rdd.saveAsTextFile(path)
-//    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
+//    Saves to hdfs as text file.
+//    df.rdd.saveAsTextFile(path)
+    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
   }
 
   /**
