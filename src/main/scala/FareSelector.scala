@@ -13,7 +13,7 @@ object FareSelector {
     .setAppName("Flight to DB")
 //    .setMaster("local[*]")
 //    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092")
-//    .set("spark.kafka.topic","local_e")
+//    .set("spark.kafka.topic","local_g")
 //    .set("spark.kafka.startingOffsets","earliest")
 
   def main(args: Array[String]): Unit = {
