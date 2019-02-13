@@ -12,8 +12,7 @@ object FareGenerator {
     .setAppName("Fare Generator")
 //    .setMaster("local[*]")
 //    .set("spark.file.in", "src/main/resources/csv/201803.csv")
-//    .set("spark.file.flights", "hdfs://ec2-18-211-110-36.compute-1.amazonaws.com:9000/")
-
+//    .set("spark.file.flights", "src/main/resources/json")
   /**
     * Converts csv to json.
     * @param df
@@ -21,9 +20,8 @@ object FareGenerator {
     */
   def save(df: DataFrame, path: String) = {
 //    Saves to hdfs as text file.
-//    df.rdd.saveAsTextFile(path)
-//    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
     df.rdd.saveAsTextFile(path)
+//    df.repartition(255).write.mode(SaveMode.Overwrite).format("json").save(path)
   }
 
   /**
