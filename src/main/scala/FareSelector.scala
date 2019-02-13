@@ -33,12 +33,12 @@ object FareSelector {
       .withColumn("record", split(col("value"),","))
       .select(
         col("record")(0).as("date"),
-        col("record")(1).as("fare"),
+        col("record")(1).as("time"),
         col("record")(2).as("from"),
-        col("record")(3).as("last_to"),
-        col("record")(4).as("last_time"),
-        col("record")(5).as("time"),
-        col("record")(6).as("to"),
+        col("record")(3).as("to"),
+        col("record")(4).as("last_to"),
+        col("record")(5).as("last_time"),
+        col("record")(6).as("fare"),
         col("record")(7).as("updated_ms"),
         unix_timestamp().as("processed_ms")).as[Flight]
 
