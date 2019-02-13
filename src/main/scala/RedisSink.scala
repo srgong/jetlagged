@@ -41,7 +41,7 @@ class RedisSink extends ForeachWriter[Flight]
       val v = "fare="+flight.fare+delim+"processed_ms="+flight.updated_ms
       val field = Map(k -> v)
       redisClient.hmset(key, field)
-      redisClient.expire(key, 600) // set TTL to 10 minutes
+      redisClient.expire(key, 86400) // set TTL to 24 hrs
     }
 
     /**

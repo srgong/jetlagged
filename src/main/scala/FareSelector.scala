@@ -4,7 +4,6 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.split
-import org.apache.spark.sql.streaming.Trigger
 
 /**
   * Created by Sharon on 1/20/19.
@@ -47,7 +46,6 @@ object FareSelector {
       .writeStream
       .outputMode("append")
       .foreach(new RedisSink)
-      .trigger(Trigger.Continuous("1 second"))
       .queryName("Spark Struc Stream to Redis")
       .start()
 
