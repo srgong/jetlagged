@@ -4,6 +4,11 @@ body {
   width: 75%;
 }
 
+.container {
+  font-size: 16px;
+  font-size: 2vw;
+}
+
 .starter-template {
   padding: 40px 15px;
 }

@@ -26,6 +26,24 @@ def flights_input():
     flights = []
     return render_template("index.html")
 
+def convert_sec(sec):
+    sec = int(sec)
+    seconds=(sec)%60
+    seconds = int(seconds)
+    minutes=(sec/(60))%60
+    minutes = int(minutes)
+    hours=(sec/(60*60))%24
+
+    print ("%d:%d:%d" % (hours, minutes, seconds))
+    if hours > 0:
+        time_ago = ("%d hrs %d mins %d secs ago" % (hours, minutes, seconds))
+    elif minutes > 0:
+        time_ago = ("%d mins %d secs ago" % (minutes, seconds))
+    else:
+        time_ago = ("%d secs ago" % (seconds))
+
+    return time_ago
+
 @app.route('/output')
 def flights_output():
     dest = request.args.get('to')
@@ -36,12 +54,12 @@ def flights_output():
     fields = g.db.hgetall(getkey)
     flights = []
     for field in fields:
-        key = field.split('@')
+        key = field.split('=')
         value = fields[field].split('@')
-        fieldKey = dict(k.split('=') for k in key)
+        fieldKey = {key[0]: key[1]}
         valueKey = dict(v.split('=') for v in value)
         flight = dict(fieldKey.items() + valueKey.items())
-        flight['freshness'] = ( int(datetime.utcnow().strftime("%s")) - int(flight['processed_ms']) )
+        flight['freshness'] = convert_sec(int(datetime.utcnow().strftime("%s")) - int(flight['processed_ms']))
         flights.append(flight)
         print flight
     return render_template("output.html", args = args, flights = flights, animation_time="30")
