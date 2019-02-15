@@ -2,17 +2,14 @@
   * Created by Sharon on 1/20/19.
   */
 
-import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode, SparkSession}
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
+import org.apache.spark.{SparkConf}
 import org.apache.spark.sql.functions._
 
 object FareGenerator {
 
   val sparkConf = new SparkConf()
     .setAppName("Fare Generator")
-//    .setMaster("local[*]")
-//    .set("spark.file.in", "src/main/resources/csv/201803.csv")
-//    .set("spark.file.flights", "src/main/resources/json")
   /**
     * Saves to hdfs as text file.
     * @param df
@@ -113,7 +110,6 @@ object FareGenerator {
 
     val df = sqlContext.read.option("header", "true").csv(sparkConf.get("spark.file.in"))
     val withTime = getTime(df).select("date","time","from","to","dep_datetime","arr_datetime").distinct
-//    println(withTime.count) // 201803 611,987
 
     val withLayover = findLayovers(withTime, maxLayoverHours = 3)
     val withLayoverReplication = replicate(withLayover,5)

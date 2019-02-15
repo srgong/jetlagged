@@ -11,10 +11,6 @@ import org.apache.spark.sql.functions.split
 object FareSelector {
   val sparkConf = new SparkConf()
     .setAppName("Flight to DB")
-//    .setMaster("local[*]")
-//    .set("spark.kafka.brokers","ec2-18-211-110-36.compute-1.amazonaws.com:9092")
-//    .set("spark.kafka.topic","local_h")
-//    .set("spark.kafka.startingOffsets","earliest")
 
   def main(args: Array[String]): Unit = {
 
