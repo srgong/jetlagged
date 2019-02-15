@@ -1,10 +1,8 @@
+package preprocessing
+
 /**
   * Created by Sharon on 1/20/19.
   */
-
-import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
-import org.apache.spark.{SparkConf}
-import org.apache.spark.sql.functions._
 
 object FareGenerator {
 

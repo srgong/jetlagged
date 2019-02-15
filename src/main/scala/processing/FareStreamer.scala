@@ -1,10 +1,6 @@
-import java.util.Properties
+package processing
 
-import org.apache.kafka.common.serialization.StringSerializer
-import org.apache.spark.{SparkConf}
-import org.apache.spark.sql.{SparkSession}
-import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.ProducerRecord
+import java.util.Properties
 
 /**
   * Created by Sharon on 1/22/19.
