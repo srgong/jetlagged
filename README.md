@@ -1,7 +1,7 @@
 # Table of Contents
 1. [Introduction](README.md#introduction)
 2. [Pipeline](README.md#pipeline)
-3. [Get Started](README.md#pipeline)
+3. [Getting Started](README.md#gettingstarted)
 
 # Introduction
 
