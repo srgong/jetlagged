@@ -2,7 +2,6 @@
 1. [Introduction](README.md#introduction)
 2. [Pipeline](README.md#pipeline)
 3. [Get Started](README.md#pipeline)
-4. [Product](README.md#product)
 
 # Introduction
 
