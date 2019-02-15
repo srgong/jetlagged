@@ -23,10 +23,7 @@ Multi airline pricing updates are simulated using Kafka producers. Streams conve
 `build.sbt` shows all code dependencies and versions.
 
 #### Cluster Environment
-This project used 3 clusters with Zookeeper, Kafka, Hadoop, Spark, and Redis installed.
+This project uses 3 clusters with Zookeeper, Kafka, Hadoop, Spark, and Redis installed. Each node has ~7g. Samples of spark-submit scripts are included in `bash/` to show tuning parameters.
 * 4 nodes for Kafka producers 
 * 4 nodes for Spark Structured Streaming consumer
 * 1 node for Redis
-
-
-
