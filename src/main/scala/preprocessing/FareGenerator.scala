@@ -1,5 +1,9 @@
 package preprocessing
 
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.{DataFrame, SQLContext, SparkSession}
+import org.apache.spark.sql.functions._
+
 /**
   * Created by Sharon on 1/20/19.
   */
@@ -24,6 +28,8 @@ object FareGenerator {
     * @return
     */
   def replicate(df: DataFrame, n: Int) = {
+//    import org.apache.spark.sql.functions.explode
+    import org.apache.spark.sql.functions._
     df.cache()
     df.withColumn("dummy", explode(array((1 until n).map(lit): _*)))
       .drop("dummy")

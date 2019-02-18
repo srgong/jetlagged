@@ -2,6 +2,11 @@ package processing
 
 import java.util.Properties
 
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import org.apache.kafka.common.serialization.StringSerializer
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+
 /**
   * Created by Sharon on 1/22/19.
   */
@@ -30,7 +35,6 @@ object FareStreamer {
       ds.foreachPartition { eachPartition => {
         val kProducer = new KafkaProducer[String, String](KafkaProducerConfigs().properties)
         eachPartition.foreach { eachElement => {
-          Thread.sleep(1000)
           val pricing_time = (System.currentTimeMillis / 1000).toString
           val record = eachElement.substring(1, eachElement.length-1).concat(","+pricing_time)
           println(record)

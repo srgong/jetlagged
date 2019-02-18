@@ -1,6 +1,8 @@
 package connector
 
+import com.redis.RedisClient
 import model.Flight
+import org.apache.spark.sql.ForeachWriter
 
 /**
   * Created by Sharon on 1/25/19.

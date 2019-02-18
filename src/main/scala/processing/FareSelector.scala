@@ -1,17 +1,19 @@
 package processing
 
-
 import connector.RedisSink
 import model.Flight
-
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
 /**
   * Created by Sharon on 1/20/19.
   */
 object FareSelector {
-  val sparkConf = new SparkConf()
-    .setAppName("Flight to DB")
+
 
   def main(args: Array[String]): Unit = {
+    val sparkConf = new SparkConf()
+      .setAppName("Flight to DB")
 
     val spark: SparkSession =
       SparkSession.builder().config(sparkConf).getOrCreate()
