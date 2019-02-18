@@ -28,8 +28,6 @@ object FareGenerator {
     * @return
     */
   def replicate(df: DataFrame, n: Int) = {
-//    import org.apache.spark.sql.functions.explode
-    import org.apache.spark.sql.functions._
     df.cache()
     df.withColumn("dummy", explode(array((1 until n).map(lit): _*)))
       .drop("dummy")

@@ -1,10 +1,12 @@
 package processing
 
+
 import connector.RedisSink
 import model.Flight
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
+
 /**
   * Created by Sharon on 1/20/19.
   */
@@ -24,6 +26,8 @@ object FareSelector {
       .option("subscribe", sparkConf.get("spark.kafka.topic"))
       .option("startingOffsets", sparkConf.get("spark.kafka.startingOffsets"))
       .load()
+
+    import spark.implicits._
     val kafkaData = kafka
       .withColumn("record", split(col("value"),","))
       .select(
