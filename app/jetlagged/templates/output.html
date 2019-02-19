@@ -28,19 +28,19 @@
 
       <form action="/output" method="GET">
         <div class="form-group row">
-          <div class="col-md-3">
+          <div class="col-md-4">
             <input type="text" name='from' placeholder="Origin" value={{ args['from'] }}>
           </div>
-          <div class ="col-md-3">
+          <div class ="col-md-4">
             <input type="text" name='to' placeholder="Destination" value={{ args['to'] }}>
           </div>
-          <div  class ="col-md-3">
+          <div  class ="col-md-4">
             <input type="text" name='date' placeholder="MM-DD-YYYY" value={{ args['date'] }}>
           </div>
         </div>
         <small class="form-text text-muted">Feeling adventurous? Try {{ adventures['from'] }} to {{ adventures['to'] }} on {{ adventures['date'] }}</small>
-           <!--<button formaction="http://jetlagged.xyz/output" type="submit" class="btn btn-primary btn-lg">Search</button>-->
-           <button type="submit" class="btn btn-primary btn-lg">Search</button>
+           <button formaction="http://jetlagged.xyz/output" type="submit" class="btn btn-primary btn-lg">Search</button>
+           <!--<button type="submit" class="btn btn-primary btn-lg">Search</button>-->
 
       </form>
 
