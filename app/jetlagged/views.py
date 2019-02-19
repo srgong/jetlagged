@@ -23,8 +23,12 @@ def inject_now():
 @app.route('/')
 @app.route('/index')
 def flights_input():
-    flights = []
-    return render_template("index.html")
+    return render_template("index.html", args = feeling_adventurous())
+
+def feeling_adventurous():
+    key = g.db.randomkey()
+    args = dict(arg.split('=') for arg in key.split('@'))
+    return args
 
 def convert_sec(sec):
     sec = int(sec)
@@ -46,6 +50,7 @@ def convert_sec(sec):
 
 @app.route('/output')
 def flights_output():
+    adventures = feeling_adventurous()
     dest = request.args.get('to')
     origin = request.args.get('from')
     date = request.args.get('date')
@@ -56,10 +61,16 @@ def flights_output():
     for field in fields:
         key = field.split('=')
         value = fields[field].split('@')
-        fieldKey = {key[0]: key[1]}
-        valueKey = dict(v.split('=') for v in value)
-        flight = dict(fieldKey.items() + valueKey.items())
+        field_key = {key[0]: key[1]}
+        value_key = dict(v.split('=') for v in value)
+        flight = dict(field_key.items() + value_key.items())
         flight['freshness'] = convert_sec(int(datetime.utcnow().strftime("%s")) - int(flight['processed_ms']))
         flights.append(flight)
         print flight
-    return render_template("output.html", args = args, flights = flights, animation_time="30")
+    sorted_flights = sorted(flights, key=lambda k: k['fare'])
+    bests = sorted_flights.pop(0)
+    if any(f['last_leg'] == 'None' for f in flights):
+        bests['direct_fare'] = min(d['fare'] for d in flights if d['last_leg'] == 'None')
+    else:
+        bests['direct_fare'] = ""
+    return render_template("output.html", args = args, bests = [bests], adventures = adventures, flights = sorted_flights, animation_time="30")

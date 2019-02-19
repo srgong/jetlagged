@@ -1,14 +1,22 @@
-body {
-  padding-top: 50px;
-  margin: auto;
-  width: 75%;
-}
-
 .container {
-  font-size: 16px;
-  font-size: 2vw;
+    padding: 25px;
+    margin: auto;
+    width: 50%;
+    font-size: 12px;
+    font-size: 2vw;
 }
 
-.starter-template {
-  padding: 40px 15px;
+small {
+    padding-right: 15px;
+    padding-bottom: 15px;
+    font-size: 10px;
+    font-size: 1vw;
+    font-style: italic;
 }
+
+.results {
+    padding: 10px;
+    font-size: 12px;
+    font-size: 1.5vw;
+}
+
