@@ -1,5 +1,6 @@
 #!/bin/bash
-spark-submit --class FareStreamer \
+
+spark-submit --class processing.FareStreamer \
   --master spark://<master_node>:7077 \
   --deploy-mode client \
   --conf spark.hdfs.in=hdfs://<abs_path>:9000 \

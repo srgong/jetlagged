@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
- spark-submit --class FareSelector \
+ spark-submit --class processing.FareSelector \
    --master spark://<master_node>:7077 \
    --deploy-mode client \
    --conf spark.kafka.brokers=<worker_node>:9092 \
