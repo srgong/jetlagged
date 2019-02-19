@@ -68,9 +68,12 @@ def flights_output():
         flights.append(flight)
         print flight
     sorted_flights = sorted(flights, key=lambda k: k['fare'])
-    bests = sorted_flights.pop(0)
-    if any(f['last_leg'] == 'None' for f in flights):
-        bests['direct_fare'] = min(d['fare'] for d in flights if d['last_leg'] == 'None')
+    if len(sorted_flights) > 0:
+        bests = [sorted_flights.pop(0)]
+        if any(f['last_leg'] == 'None' for f in flights):
+            bests[0]['direct_fare'] = min(d['fare'] for d in flights if d['last_leg'] == 'None')
+        else:
+            bests[0]['direct_fare'] = ""
     else:
-        bests['direct_fare'] = ""
-    return render_template("output.html", args = args, bests = [bests], adventures = adventures, flights = sorted_flights, animation_time="30")
+        bests = []
+    return render_template("output.html", args = args, bests = bests, adventures = adventures, flights = sorted_flights, animation_time="30")
