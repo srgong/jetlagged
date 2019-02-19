@@ -121,7 +121,7 @@ object FareGenerator {
     val withNormalisedCols = withReplication.withColumn("last",lit("None")).withColumn("last_time",lit("None"))
     val withDirectFare = generateFare(df = withNormalisedCols,  min_fare = 350, max_fare = 700, mean = 353, stddev = 60)
 
-    val flights = withLayoverFare.union(withDirectFare)
+    val flights = withDirectFare.union(withLayoverFare)
     flights.cache
     save(flights, sparkConf.get("spark.file.flights"))
   }

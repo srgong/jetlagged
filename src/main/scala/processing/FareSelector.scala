@@ -1,6 +1,5 @@
 package processing
 
-
 import connector.RedisSink
 import model.Flight
 import org.apache.spark.SparkConf
@@ -11,7 +10,6 @@ import org.apache.spark.sql.functions._
   * Created by Sharon on 1/20/19.
   */
 object FareSelector {
-
 
   def main(args: Array[String]): Unit = {
     val sparkConf = new SparkConf()

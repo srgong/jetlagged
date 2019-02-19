@@ -25,25 +25,25 @@ class RedisSink extends ForeachWriter[Flight]
       *         indicates the partition should be skipped.
       */
 
+    var redisClient: RedisClient = _
     def open(partitionId: Long, version: Long): Boolean = {
       println("Open Connection")
+      redisClient = new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
       true
     }
     /**
       * Called to process the data in the executor side. This method will be called only when `open`
       * returns `true`.
       */
-    def process(flight: Flight): Unit = {
+    def process(flight: Flight) = {
       println(s"Process $flight")
-      val redisClient: RedisClient =  new RedisClient("ec2-3-86-129-28.compute-1.amazonaws.com", 6379)
       val delim = "@"
       val key = "date="+flight.date + delim + "from="+flight.from + delim + "to="+flight.to
       val k = "last_leg="+flight.last_to
       val v = "fare="+flight.fare+delim+"processed_ms="+flight.updated_ms
       val field = Map(k -> v)
       redisClient.hmset(key, field)
-      // set TTL to 24 hrs
-      redisClient.expire(key, 86400)
+      redisClient.expire(key, 86400) // set TTL to 24 hrs
     }
 
     /**
