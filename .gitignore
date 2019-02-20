@@ -1,0 +1,10 @@
+resources/
+.DS_STORE
+out/
+target/
+.idea
+project/target
+project/project
+.pyc
+checkpoint/
+spark-warehouse/
