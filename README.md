@@ -9,7 +9,6 @@ Flights with layovers are generally cheaper than direct flights. What if your la
 
 This is a real time pricing solution for low cost airfare. Streaming is important because consumers should make their purchase decision on the latest airfare. This application will surface the latest and lowest price for a trip.
 
-Check out the finished product here: [jetlagged.xyz](http://jetlagged.xyz)
 
 # Pipeline
 
